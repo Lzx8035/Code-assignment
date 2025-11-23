@@ -1,0 +1,238 @@
+<div class="admin-edit-container">
+  <header class="header">
+    <button class="btn btn-back" (click)="goBack()">
+      ← Back to Funds List
+    </button>
+    <h1>Edit Fund</h1>
+  </header>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading fund data...</p>
+  </div>
+
+  <div *ngIf="error && !loading" class="error-message">
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="goBack()">Go Back</button>
+  </div>
+
+  <div *ngIf="!loading && fund" class="edit-form">
+    <div class="form-header">
+      <h2>{{ fund.name }}</h2>
+      <div class="status-indicators">
+        <span *ngIf="saving" class="status-saving">Saving...</span>
+        <span *ngIf="success" class="status-success">{{ success }}</span>
+        <span *ngIf="error" class="status-error">{{ error }}</span>
+      </div>
+    </div>
+
+    <form (ngSubmit)="saveFund()" class="fund-form">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Fund Name</label>
+            <input
+              type="text"
+              id="name"
+              [(ngModel)]="fund.name"
+              (ngModelChange)="onFieldChange()"
+              name="name"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="currency">Currency</label>
+            <input
+              type="text"
+              id="currency"
+              [(ngModel)]="fund.currency"
+              (ngModelChange)="onFieldChange()"
+              name="currency"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="fundSize">Fund Size</label>
+            <input
+              type="number"
+              id="fundSize"
+              [(ngModel)]="fund.fundSize"
+              (ngModelChange)="onFieldChange()"
+              name="fundSize"
+              class="form-input"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="vintage">Vintage Year</label>
+            <input
+              type="number"
+              id="vintage"
+              [(ngModel)]="fund.vintage"
+              (ngModelChange)="onFieldChange()"
+              name="vintage"
+              class="form-input"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategies -->
+      <div class="form-section">
+        <h3>Strategies</h3>
+        <div class="array-input-group">
+          <div
+            *ngFor="let strategy of fund.strategies; let i = index"
+            class="array-item"
+          >
+            <select
+              [(ngModel)]="fund.strategies[i]"
+              (ngModelChange)="onFieldChange()"
+              [name]="'strategy-' + i"
+              class="form-select"
+            >
+              <option value="">Select a strategy</option>
+              <option
+                *ngFor="let option of filterMeta.strategies"
+                [value]="option"
+              >
+                {{ option }}
+              </option>
+            </select>
+            <button
+              type="button"
+              class="btn btn-icon btn-remove"
+              (click)="removeStrategy(i)"
+              title="Remove strategy"
+            >
+              ×
+            </button>
+          </div>
+          <button
+            type="button"
+            class="btn btn-secondary btn-add"
+            (click)="addStrategy()"
+          >
+            + Add Strategy
+          </button>
+        </div>
+      </div>
+
+      <!-- Geographies -->
+      <div class="form-section">
+        <h3>Geographies</h3>
+        <div class="array-input-group">
+          <div
+            *ngFor="let geography of fund.geographies; let i = index"
+            class="array-item"
+          >
+            <select
+              [(ngModel)]="fund.geographies[i]"
+              (ngModelChange)="onFieldChange()"
+              [name]="'geography-' + i"
+              class="form-select"
+            >
+              <option value="">Select a geography</option>
+              <option
+                *ngFor="let option of filterMeta.geographies"
+                [value]="option"
+              >
+                {{ option }}
+              </option>
+            </select>
+            <button
+              type="button"
+              class="btn btn-icon btn-remove"
+              (click)="removeGeography(i)"
+              title="Remove geography"
+            >
+              ×
+            </button>
+          </div>
+          <button
+            type="button"
+            class="btn btn-secondary btn-add"
+            (click)="addGeography()"
+          >
+            + Add Geography
+          </button>
+        </div>
+      </div>
+
+      <!-- Managers -->
+      <div class="form-section">
+        <h3>Managers</h3>
+        <div class="array-input-group">
+          <div
+            *ngFor="let manager of fund.managers; let i = index"
+            class="array-item"
+          >
+            <select
+              [(ngModel)]="fund.managers[i]"
+              (ngModelChange)="onFieldChange()"
+              [name]="'manager-' + i"
+              class="form-select"
+            >
+              <option value="">Select a manager</option>
+              <option
+                *ngFor="let option of filterMeta.managers"
+                [value]="option"
+              >
+                {{ option }}
+              </option>
+            </select>
+            <button
+              type="button"
+              class="btn btn-icon btn-remove"
+              (click)="removeManager(i)"
+              title="Remove manager"
+            >
+              ×
+            </button>
+          </div>
+          <button
+            type="button"
+            class="btn btn-secondary btn-add"
+            (click)="addManager()"
+          >
+            + Add Manager
+          </button>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-section">
+        <h3>Description</h3>
+        <div class="form-group">
+          <textarea
+            id="description"
+            [(ngModel)]="fund.description"
+            (ngModelChange)="onFieldChange()"
+            name="description"
+            class="form-textarea"
+            rows="4"
+            placeholder="Enter fund description"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="goBack()">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? "Saving..." : "Save Changes" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

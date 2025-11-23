@@ -10,14 +10,14 @@
       "Middle East"
     ],
     "currency": "CAD",
-    "fundSize": 1199.0,
+    "fundSize": 1199,
     "vintage": 2025,
     "managers": [
       "Silver Rock",
       "Orion Equity",
       "Blue Lake Fund"
     ],
-    "description": "Hedge fund with a long/short equity strategy."
+    "description": "I am a test\n"
   },
   {
     "name": "ZRE Fund 75",

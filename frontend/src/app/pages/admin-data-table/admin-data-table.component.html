@@ -1,0 +1,304 @@
+<div class="admin-data-table-container">
+  <header class="header">
+    <h1>Admin Data Table</h1>
+    <p class="subtitle">Funds Data Management</p>
+  </header>
+
+  <div class="filters-panel">
+    <div class="filters-header">
+      <h3>Filter & Search</h3>
+      <button class="btn btn-secondary" (click)="resetFilters()">Reset</button>
+    </div>
+
+    <div class="filters-grid">
+      <!-- Name Search -->
+      <div class="filter-group">
+        <label>Fund Name</label>
+        <input
+          type="text"
+          [(ngModel)]="filters.name"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Search by name..."
+          class="form-input"
+        />
+      </div>
+
+      <!-- Currency -->
+      <div class="filter-group">
+        <label>Currency</label>
+        <select
+          [(ngModel)]="filters.currency"
+          (ngModelChange)="onFilterChange()"
+          class="form-select"
+        >
+          <option value="">All Currencies</option>
+          <option
+            *ngFor="let currency of filterMeta.currencies"
+            [value]="currency"
+          >
+            {{ currency }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Fund Size Range -->
+      <div class="filter-group">
+        <label>Fund Size (Min)</label>
+        <input
+          type="number"
+          [(ngModel)]="filters.minFundSize"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Min"
+          class="form-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>Fund Size (Max)</label>
+        <input
+          type="number"
+          [(ngModel)]="filters.maxFundSize"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Max"
+          class="form-input"
+        />
+      </div>
+
+      <!-- Vintage Range -->
+      <div class="filter-group">
+        <label>Vintage Year (Min)</label>
+        <input
+          type="number"
+          [(ngModel)]="filters.minVintage"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Min Year"
+          class="form-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>Vintage Year (Max)</label>
+        <input
+          type="number"
+          [(ngModel)]="filters.maxVintage"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Max Year"
+          class="form-input"
+        />
+      </div>
+
+      <!-- Sort Options -->
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [(ngModel)]="filters.sortBy"
+          (ngModelChange)="onFilterChange()"
+          class="form-select"
+        >
+          <option value="">No Sorting</option>
+          <option value="name">Name</option>
+          <option value="fundSize">Fund Size</option>
+          <option value="vintage">Vintage</option>
+        </select>
+      </div>
+
+      <div class="filter-group" *ngIf="filters.sortBy">
+        <label>Sort Order</label>
+        <select
+          [(ngModel)]="filters.sortOrder"
+          (ngModelChange)="onFilterChange()"
+          class="form-select"
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Multi-select Dropdowns -->
+    <div class="multi-select-section">
+      <div class="multi-select-group">
+        <label>Strategies</label>
+        <div class="multi-select-dropdown">
+          <button
+            class="multi-select-button"
+            type="button"
+            [class.active]="filters.strategies.length > 0"
+            (click)="toggleStrategiesDropdown($event)"
+          >
+            {{
+              filters.strategies.length > 0
+                ? filters.strategies.length + " selected"
+                : "Select Strategies"
+            }}
+            <span class="dropdown-arrow" [class.open]="showStrategiesDropdown"
+              >▼</span
+            >
+          </button>
+          <div
+            class="multi-select-options"
+            *ngIf="showStrategiesDropdown"
+            (click)="$event.stopPropagation()"
+          >
+            <label
+              *ngFor="let strategy of filterMeta.strategies"
+              class="multi-select-option"
+            >
+              <input
+                type="checkbox"
+                [checked]="filters.strategies.includes(strategy)"
+                (change)="toggleStrategy(strategy)"
+              />
+              <span>{{ strategy }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="multi-select-group">
+        <label>Geographies</label>
+        <div class="multi-select-dropdown">
+          <button
+            class="multi-select-button"
+            type="button"
+            [class.active]="filters.geographies.length > 0"
+            (click)="toggleGeographiesDropdown($event)"
+          >
+            {{
+              filters.geographies.length > 0
+                ? filters.geographies.length + " selected"
+                : "Select Geographies"
+            }}
+            <span class="dropdown-arrow" [class.open]="showGeographiesDropdown"
+              >▼</span
+            >
+          </button>
+          <div
+            class="multi-select-options"
+            *ngIf="showGeographiesDropdown"
+            (click)="$event.stopPropagation()"
+          >
+            <label
+              *ngFor="let geography of filterMeta.geographies"
+              class="multi-select-option"
+            >
+              <input
+                type="checkbox"
+                [checked]="filters.geographies.includes(geography)"
+                (change)="toggleGeography(geography)"
+              />
+              <span>{{ geography }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Filters Display -->
+    <div
+      class="selected-filters"
+      *ngIf="filters.strategies.length > 0 || filters.geographies.length > 0"
+    >
+      <span class="selected-label">Active Filters:</span>
+      <span *ngFor="let strategy of filters.strategies" class="filter-tag">
+        Strategy: {{ strategy }}
+        <button
+          type="button"
+          class="tag-remove"
+          (click)="toggleStrategy(strategy)"
+        >
+          ×
+        </button>
+      </span>
+      <span *ngFor="let geography of filters.geographies" class="filter-tag">
+        Geography: {{ geography }}
+        <button
+          type="button"
+          class="tag-remove"
+          (click)="toggleGeography(geography)"
+        >
+          ×
+        </button>
+      </span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-primary" (click)="loadFunds()" [disabled]="loading">
+      {{ loading ? "Loading..." : "Refresh" }}
+    </button>
+    <span class="count-badge">{{ funds.length }} funds</span>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="loading && funds.length === 0" class="loading">
+    <p>Loading funds data...</p>
+  </div>
+
+  <div *ngIf="!loading && funds.length === 0 && !error" class="empty-state">
+    <p>No funds data available.</p>
+  </div>
+
+  <div *ngIf="!loading && funds.length > 0" class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Strategies</th>
+          <th>Geographies</th>
+          <th>Currency</th>
+          <th>Fund Size</th>
+          <th>Vintage</th>
+          <th>Managers</th>
+          <th>Description</th>
+          <th class="actions-header">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fund of funds">
+          <td class="name-cell">
+            {{ fund.name }}
+          </td>
+          <td class="list-cell">
+            <span *ngFor="let strategy of fund.strategies; let last = last">
+              {{ strategy }}<span *ngIf="!last">, </span>
+            </span>
+          </td>
+          <td class="list-cell">
+            <span *ngFor="let geo of fund.geographies; let last = last">
+              {{ geo }}<span *ngIf="!last">, </span>
+            </span>
+          </td>
+          <td>{{ fund.currency }}</td>
+          <td class="number-cell">{{ fund.fundSize | number : "1.2-2" }}</td>
+          <td class="number-cell">{{ fund.vintage }}</td>
+          <td class="list-cell">
+            <span *ngFor="let manager of fund.managers; let last = last">
+              {{ manager }}<span *ngIf="!last">, </span>
+            </span>
+          </td>
+          <td class="description-cell">{{ fund.description }}</td>
+          <td class="actions-cell">
+            <button
+              class="btn-icon btn-edit"
+              (click)="editFund(fund.name)"
+              title="Edit fund"
+            >
+              ✏️
+            </button>
+            <button
+              class="btn-icon btn-delete"
+              (click)="deleteFund(fund.name)"
+              title="Delete fund"
+            >
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

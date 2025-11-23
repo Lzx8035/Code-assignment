@@ -186,7 +186,7 @@ app.get("/api/funds", (req: Request, res: Response): void => {
 });
 
 // GET /api/funds/meta - Get filter options for dropdowns
-// Returns unique values for strategies, geographies, and currencies
+// Returns unique values for strategies, geographies, currencies, and managers
 app.get("/api/funds/meta", (_req: Request, res: Response): void => {
   const funds = readFundsData();
 
@@ -202,10 +202,15 @@ app.get("/api/funds/meta", (_req: Request, res: Response): void => {
   const allCurrencies = funds.map((fund) => fund.currency);
   const uniqueCurrencies = [...new Set(allCurrencies)].sort();
 
+  // Extract and deduplicate managers
+  const allManagers = funds.flatMap((fund) => fund.managers);
+  const uniqueManagers = [...new Set(allManagers)].sort();
+
   res.json({
     strategies: uniqueStrategies,
     geographies: uniqueGeographies,
     currencies: uniqueCurrencies,
+    managers: uniqueManagers,
   });
 });
 
