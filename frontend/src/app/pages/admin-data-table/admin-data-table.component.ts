@@ -195,8 +195,14 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
   }
 
   updateUrlParams(): void {
-    const queryParams: { [key: string]: string | number } = {};
+    const queryParams: { [key: string]: string | number | null | undefined } =
+      {};
 
+    // Always set pagination parameters
+    queryParams['page'] = this.currentPage;
+    queryParams['pageSize'] = this.pageSize;
+
+    // Set filter parameters (only if they have values)
     if (this.filters.name) {
       queryParams['name'] = this.filters.name;
     }
@@ -238,15 +244,13 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
       queryParams['sortOrder'] = this.filters.sortOrder;
     }
 
-    // Add pagination parameters
-    queryParams['page'] = this.currentPage;
-    queryParams['pageSize'] = this.pageSize;
-
     // Update URL without reloading the page
+    // Use replaceUrl to avoid adding to browser history
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: queryParams,
-      queryParamsHandling: 'merge',
+      queryParamsHandling: '',
+      replaceUrl: false,
     });
   }
 

@@ -10,6 +10,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TagComponent } from '../tag/tag.component';
 import { IconComponent } from '../icon/icon.component';
+import {
+  CustomDropdownComponent,
+  DropdownOption,
+} from '../custom-dropdown/custom-dropdown.component';
 
 export interface FilterMeta {
   strategies: string[];
@@ -34,7 +38,13 @@ export interface FilterOptions {
 
 @Component({
   selector: 'app-filter-panel',
-  imports: [CommonModule, FormsModule, TagComponent, IconComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TagComponent,
+    IconComponent,
+    CustomDropdownComponent,
+  ],
   templateUrl: './filter-panel.component.html',
   styleUrl: './filter-panel.component.scss',
   standalone: true,
@@ -67,6 +77,8 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
   showStrategiesDropdown = false;
   showGeographiesDropdown = false;
   showManagersDropdown = false;
+  showSortByDropdown = false;
+  showCurrencyDropdown = false;
 
   ngOnInit(): void {
     // Close dropdowns when clicking outside (only in browser)
@@ -106,8 +118,23 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Create a new object to ensure change detection works properly
+    const filtersCopy: FilterOptions = {
+      name: this.filters.name,
+      strategies: [...this.filters.strategies],
+      geographies: [...this.filters.geographies],
+      managers: [...this.filters.managers],
+      currency: this.filters.currency,
+      minFundSize: this.filters.minFundSize,
+      maxFundSize: this.filters.maxFundSize,
+      minVintage: this.filters.minVintage,
+      maxVintage: this.filters.maxVintage,
+      sortBy: this.filters.sortBy,
+      sortOrder: this.filters.sortOrder,
+    };
+
     // If validation passes, emit the filter change
-    this.filterChange.emit(this.filters);
+    this.filterChange.emit(filtersCopy);
   }
 
   onReset(): void {
@@ -152,6 +179,8 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
     if (this.showStrategiesDropdown) {
       this.showGeographiesDropdown = false;
       this.showManagersDropdown = false;
+      this.showSortByDropdown = false;
+      this.showCurrencyDropdown = false;
     }
   }
 
@@ -163,6 +192,8 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
     if (this.showGeographiesDropdown) {
       this.showStrategiesDropdown = false;
       this.showManagersDropdown = false;
+      this.showSortByDropdown = false;
+      this.showCurrencyDropdown = false;
     }
   }
 
@@ -174,12 +205,148 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
     if (this.showManagersDropdown) {
       this.showStrategiesDropdown = false;
       this.showGeographiesDropdown = false;
+      this.showSortByDropdown = false;
+      this.showCurrencyDropdown = false;
     }
+  }
+
+  toggleSortByDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showSortByDropdown = !this.showSortByDropdown;
+    if (this.showSortByDropdown) {
+      this.showStrategiesDropdown = false;
+      this.showGeographiesDropdown = false;
+      this.showManagersDropdown = false;
+      this.showCurrencyDropdown = false;
+    }
+  }
+
+  toggleCurrencyDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showCurrencyDropdown = !this.showCurrencyDropdown;
+    if (this.showCurrencyDropdown) {
+      this.showStrategiesDropdown = false;
+      this.showGeographiesDropdown = false;
+      this.showManagersDropdown = false;
+      this.showSortByDropdown = false;
+    }
+  }
+
+  selectCurrency(value: string): void {
+    this.filters.currency = value;
+    this.showCurrencyDropdown = false;
+  }
+
+  selectSortBy(value: string): void {
+    this.filters.sortBy = value;
+    this.showSortByDropdown = false;
   }
 
   closeDropdowns(): void {
     this.showStrategiesDropdown = false;
     this.showGeographiesDropdown = false;
     this.showManagersDropdown = false;
+    this.showSortByDropdown = false;
+    this.showCurrencyDropdown = false;
+  }
+
+  // Helper methods for dropdown options
+  getCurrencyOptions(): DropdownOption[] {
+    return [
+      { value: '', label: 'All Currencies' },
+      ...this.filterMeta.currencies.map((c) => ({ value: c, label: c })),
+    ];
+  }
+
+  getSortByOptions(): DropdownOption[] {
+    return [
+      { value: '', label: 'No Sorting' },
+      { value: 'name:asc', label: 'Name (a-z)' },
+      { value: 'name:desc', label: 'Name (z-a)' },
+      { value: 'fundSize:asc', label: 'Fund Size (Low to High)' },
+      { value: 'fundSize:desc', label: 'Fund Size (High to Low)' },
+      { value: 'vintage:asc', label: 'Vintage (Old to New)' },
+      { value: 'vintage:desc', label: 'Vintage (New to Old)' },
+    ];
+  }
+
+  getCurrentSortValue(): string[] {
+    if (!this.filters.sortBy) {
+      return [];
+    }
+    const sortValue = `${this.filters.sortBy}:${
+      this.filters.sortOrder || 'asc'
+    }`;
+    return [sortValue];
+  }
+
+  getStrategyOptions(): DropdownOption[] {
+    return this.filterMeta.strategies.map((s) => ({ value: s, label: s }));
+  }
+
+  getGeographyOptions(): DropdownOption[] {
+    return this.filterMeta.geographies.map((g) => ({ value: g, label: g }));
+  }
+
+  getManagerOptions(): DropdownOption[] {
+    return this.filterMeta.managers.map((m) => ({ value: m, label: m }));
+  }
+
+  // Event handlers for custom dropdown
+  onCurrencyChange(values: string[]): void {
+    this.filters.currency = values[0] || '';
+  }
+
+  onSortByChange(values: string[]): void {
+    const sortValue = values[0] || '';
+    if (!sortValue) {
+      this.filters.sortBy = '';
+      this.filters.sortOrder = 'asc';
+    } else {
+      const [sortBy, sortOrder] = sortValue.split(':');
+      this.filters.sortBy = sortBy;
+      this.filters.sortOrder = sortOrder || 'asc';
+    }
+  }
+
+  onStrategiesChange(values: string[]): void {
+    this.filters.strategies = values;
+  }
+
+  onGeographiesChange(values: string[]): void {
+    this.filters.geographies = values;
+  }
+
+  onManagersChange(values: string[]): void {
+    this.filters.managers = values;
+  }
+
+  onCurrencyToggle(): void {
+    this.closeDropdowns();
+    this.showCurrencyDropdown = !this.showCurrencyDropdown;
+  }
+
+  onSortByToggle(): void {
+    this.closeDropdowns();
+    this.showSortByDropdown = !this.showSortByDropdown;
+  }
+
+  onStrategiesToggle(): void {
+    this.closeDropdowns();
+    this.showStrategiesDropdown = !this.showStrategiesDropdown;
+  }
+
+  onGeographiesToggle(): void {
+    this.closeDropdowns();
+    this.showGeographiesDropdown = !this.showGeographiesDropdown;
+  }
+
+  onManagersToggle(): void {
+    this.closeDropdowns();
+    this.showManagersDropdown = !this.showManagersDropdown;
   }
 }

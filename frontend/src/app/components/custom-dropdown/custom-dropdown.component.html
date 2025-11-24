@@ -1,0 +1,37 @@
+<div class="custom-dropdown">
+  <button
+    class="dropdown-button"
+    type="button"
+    [class.active]="active"
+    (click)="onToggle($event)"
+  >
+    {{ displayText }}
+    <app-icon
+      name="chevron-down"
+      [size]="12"
+      className="dropdown-arrow"
+      [ngClass]="{ open: isDropdownOpen }"
+    ></app-icon>
+  </button>
+  <div
+    class="dropdown-options"
+    *ngIf="isDropdownOpen"
+    (click)="$event.stopPropagation()"
+  >
+    <div
+      *ngFor="let option of options"
+      class="dropdown-option"
+      [class.single-select]="!multiple"
+      [class.selected]="isSelected(option.value)"
+      (click)="onOptionClick(option, $event)"
+    >
+      <input
+        *ngIf="multiple"
+        type="checkbox"
+        [checked]="isSelected(option.value)"
+        (change)="$event.stopPropagation()"
+      />
+      <span>{{ option.label }}</span>
+    </div>
+  </div>
+</div>

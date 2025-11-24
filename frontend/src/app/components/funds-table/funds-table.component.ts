@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IconComponent } from '../icon/icon.component';
+import { TagComponent } from '../tag/tag.component';
 
 export interface Fund {
   name: string;
@@ -16,7 +17,7 @@ export interface Fund {
 
 @Component({
   selector: 'app-funds-table',
-  imports: [CommonModule, RouterModule, IconComponent],
+  imports: [CommonModule, RouterModule, IconComponent, TagComponent],
   templateUrl: './funds-table.component.html',
   styleUrl: './funds-table.component.scss',
   standalone: true,

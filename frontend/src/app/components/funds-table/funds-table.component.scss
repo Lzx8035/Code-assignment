@@ -1,7 +1,7 @@
 .table-wrapper {
   overflow-x: auto;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 12px;
   background-color: white;
 }
 
@@ -18,8 +18,12 @@
       text-align: left;
       font-weight: 600;
       color: #333;
-      border-bottom: 2px solid #dee2e6;
+      border-bottom: 1px solid #dee2e6;
       white-space: nowrap;
+    }
+
+    th:first-child {
+      padding-left: 1.5rem;
     }
   }
 
@@ -48,6 +52,8 @@
 .name-cell {
   font-weight: 500;
   color: #333;
+  padding-left: 1.5rem !important;
+  white-space: nowrap;
 
   .fund-name-link {
     color: #007bff;
@@ -63,12 +69,14 @@
 
 .actions-header {
   text-align: center;
-  width: 120px;
+  width: 80px;
+  background-color: #f8f9fa;
 }
 
 .actions-cell {
   text-align: center;
   white-space: nowrap;
+  background-color: #f8f9fa;
 }
 
 .btn-icon {
@@ -112,6 +120,18 @@
 .list-cell {
   max-width: 200px;
   line-height: 1.5;
+
+  app-tag {
+    display: inline-block;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.currency-size-cell {
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .number-cell {
