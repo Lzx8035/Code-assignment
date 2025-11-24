@@ -82,6 +82,31 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
   }
 
   onSearch(): void {
+    // Validate Fund Size range
+    if (
+      this.filters.minFundSize !== null &&
+      this.filters.maxFundSize !== null &&
+      this.filters.minFundSize > this.filters.maxFundSize
+    ) {
+      alert(
+        'Invalid Fund Size range: Minimum value must be less than or equal to Maximum value.'
+      );
+      return;
+    }
+
+    // Validate Vintage Year range
+    if (
+      this.filters.minVintage !== null &&
+      this.filters.maxVintage !== null &&
+      this.filters.minVintage > this.filters.maxVintage
+    ) {
+      alert(
+        'Invalid Vintage Year range: Minimum value must be less than or equal to Maximum value.'
+      );
+      return;
+    }
+
+    // If validation passes, emit the filter change
     this.filterChange.emit(this.filters);
   }
 

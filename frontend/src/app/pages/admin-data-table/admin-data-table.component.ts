@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
 import {
   FilterPanelComponent,
@@ -70,11 +71,14 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
   };
 
   private queryParamsSubscription?: Subscription;
+  private isInitialLoad = true;
+  private isUserAction = false; // Track if loadFunds is called from user action
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -84,7 +88,15 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
     this.queryParamsSubscription = this.route.queryParams.subscribe(
       (params) => {
         this.loadFiltersFromUrl(params);
-        this.loadFunds();
+        // Only call loadFunds if this is not a user action
+        // User actions will call loadFunds themselves after setting isUserAction
+        if (!this.isUserAction) {
+          this.loadFunds();
+        }
+        // Mark that initial load is complete after first subscription
+        if (this.isInitialLoad) {
+          this.isInitialLoad = false;
+        }
       }
     );
   }
@@ -250,6 +262,26 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error loading meta data:', err);
           this.metaLoading = false;
+
+          // Use requestAnimationFrame for initial load to ensure DOM is ready
+          const showErrorToast = () => {
+            this.toastr.error(
+              'Failed to load filter options. Some filters may not be available.',
+              'Warning',
+              {
+                timeOut: 5000,
+                positionClass: 'toast-bottom-right',
+              }
+            );
+          };
+
+          if (this.isInitialLoad) {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(showErrorToast);
+            });
+          } else {
+            showErrorToast();
+          }
         },
       });
   }
@@ -269,11 +301,54 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
         this.totalPages = response.pagination.totalPages;
         this.totalItems = response.pagination.total;
         this.loading = false;
+
+        // Show success toast only for user actions (not on initial load)
+        // This prevents toast timeout issues on first mount
+        // Save isUserAction before it might be reset by URL changes
+        const shouldShowToast = this.isUserAction;
+        // Reset after checking, but before any async operations
+        this.isUserAction = false;
+
+        if (
+          shouldShowToast &&
+          (response.pagination.total > 0 || this.hasActiveFilters())
+        ) {
+          this.toastr.success(
+            `Found ${response.pagination.total} items`,
+            'Search Successful',
+            {
+              timeOut: 3000,
+              positionClass: 'toast-bottom-right',
+            }
+          );
+        }
       },
       error: (err) => {
         this.error =
           'Failed to load funds data. Please make sure the backend server is running.';
         this.loading = false;
+
+        // Always show error toast, but use requestAnimationFrame for initial load
+        const showErrorToast = () => {
+          this.toastr.error(
+            'Failed to load funds data. Please make sure the backend server is running.',
+            'Error',
+            {
+              timeOut: 5000,
+              positionClass: 'toast-bottom-right',
+            }
+          );
+        };
+
+        if (this.isInitialLoad) {
+          // Use requestAnimationFrame to ensure DOM and animations are ready
+          requestAnimationFrame(() => {
+            requestAnimationFrame(showErrorToast);
+          });
+        } else {
+          showErrorToast();
+        }
+
         console.error('Error loading funds:', err);
       },
     });
@@ -333,7 +408,9 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
   onFilterChange(filters: FilterOptions): void {
     this.filters = filters;
     this.currentPage = 1; // Reset to first page when filters change
+    this.isUserAction = true; // Mark as user action (must be set before updateUrlParams)
     this.updateUrlParams();
+    // Always call loadFunds - queryParams subscription won't call it if isUserAction is true
     this.loadFunds();
   }
 
@@ -352,7 +429,10 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
       sortOrder: 'asc',
     };
     this.currentPage = 1; // Reset to first page when filters are reset
+    this.isUserAction = true; // Mark as user action (must be set before clearUrlParams)
     this.clearUrlParams();
+    // loadFunds will be called by queryParams subscription, but isUserAction is already set
+    // Call loadFunds directly to ensure it runs
     this.loadFunds();
   }
 
@@ -366,15 +446,36 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     this.currentPage = page;
+    this.isUserAction = true; // Mark as user action (must be set before updateUrlParams)
     this.updateUrlParams();
+    // loadFunds will be called by queryParams subscription, but isUserAction is already set
+    // Call loadFunds directly to ensure it runs
     this.loadFunds();
   }
 
   onPageSizeChange(newPageSize: number): void {
     this.pageSize = newPageSize;
     this.currentPage = 1; // Reset to first page when page size changes
+    this.isUserAction = true; // Mark as user action (must be set before updateUrlParams)
     this.updateUrlParams();
+    // loadFunds will be called by queryParams subscription, but isUserAction is already set
+    // Call loadFunds directly to ensure it runs
     this.loadFunds();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(
+      this.filters.name ||
+      this.filters.strategies.length > 0 ||
+      this.filters.geographies.length > 0 ||
+      this.filters.managers.length > 0 ||
+      this.filters.currency ||
+      this.filters.minFundSize !== null ||
+      this.filters.maxFundSize !== null ||
+      this.filters.minVintage !== null ||
+      this.filters.maxVintage !== null ||
+      this.filters.sortBy
+    );
   }
 
   onEditFund(fundName: string): void {
@@ -396,11 +497,28 @@ export class AdminDataTableComponent implements OnInit, OnDestroy {
       .delete(`http://localhost:3000/api/funds/${encodedName}`)
       .subscribe({
         next: () => {
+          // Show success toast
+          this.toastr.success(
+            `Fund "${fundName}" has been deleted successfully.`,
+            'Deleted',
+            {
+              timeOut: 3000,
+              positionClass: 'toast-bottom-right',
+            }
+          );
           // Reload the funds list after successful deletion
+          this.isUserAction = false; // Don't show toast for this reload
           this.loadFunds();
         },
         error: (err) => {
-          alert('Failed to delete fund. Please try again.');
+          this.toastr.error(
+            `Failed to delete fund "${fundName}". Please try again.`,
+            'Error',
+            {
+              timeOut: 5000,
+              positionClass: 'toast-bottom-right',
+            }
+          );
           console.error('Error deleting fund:', err);
         },
       });
