@@ -1,206 +1,225 @@
 <div class="admin-edit-container">
-  <header class="header">
-    <button class="btn btn-back" (click)="goBack()">
+  <!-- Navigation Bar -->
+  <nav class="nav-bar">
+    <button class="nav-back-btn" (click)="goBack()">
       <app-icon name="arrow-left" [size]="16"></app-icon>
-      Back to Funds List
+      <span>Back to Funds List</span>
     </button>
-    <h1>Edit Fund</h1>
-  </header>
+  </nav>
 
-  <div *ngIf="loading" class="loading">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
     <p>Loading fund data...</p>
   </div>
 
-  <div *ngIf="error && !loading" class="error-message">
-    <p>{{ error }}</p>
-    <button class="btn btn-primary" (click)="goBack()">Go Back</button>
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <div class="error-content">
+      <p class="error-text">{{ error }}</p>
+      <button class="btn-primary" (click)="goBack()">Go Back</button>
+    </div>
   </div>
 
+  <!-- Edit Form -->
   <div *ngIf="!loading && fund" class="edit-form">
+    <!-- Header Section -->
     <div class="form-header">
-      <h2>{{ fund.name }}</h2>
-      <div class="status-indicators">
-        <span *ngIf="saving" class="status-saving">Saving...</span>
-        <span *ngIf="success" class="status-success">{{ success }}</span>
-        <span *ngIf="error" class="status-error">{{ error }}</span>
+      <div class="header-stats">
+        <div class="stat-item stat-item-name">
+          <span class="stat-label">Fund Name</span>
+          <span class="stat-value stat-value-name">{{ fund.name }}</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button
+          class="action-btn action-finish"
+          (click)="finishEditing()"
+          title="Finish Editing"
+          [disabled]="saving"
+        >
+          <span *ngIf="!saving">Finish Editing</span>
+          <span *ngIf="saving" class="loading-spinner"></span>
+        </button>
+        <div class="status-indicators">
+          <span *ngIf="error" class="status-error">{{ error }}</span>
+        </div>
       </div>
     </div>
 
-    <form class="fund-form">
-      <!-- Basic Information -->
-      <div class="form-section">
-        <h3>Basic Information</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="name">Fund Name</label>
-            <input
-              type="text"
-              id="name"
-              [(ngModel)]="fund.name"
-              (ngModelChange)="onFieldChange()"
-              name="name"
-              class="form-input"
-              required
-            />
-          </div>
+    <div class="form-content">
+      <form class="fund-form">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <div class="info-card">
+            <h2 class="card-title">Basic Information</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="name">Fund Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  [(ngModel)]="fund.name"
+                  name="name"
+                  class="form-input"
+                  disabled
+                  required
+                />
+              </div>
 
-          <div class="form-group">
-            <label for="currency">Currency</label>
-            <select
-              id="currency"
-              [(ngModel)]="fund.currency"
-              (ngModelChange)="onFieldChange()"
-              name="currency"
-              class="form-select"
-              required
-            >
-              <option value="">Select Currency</option>
-              <option
-                *ngFor="let currency of filterMeta.currencies"
-                [value]="currency"
-              >
-                {{ currency }}
-              </option>
-            </select>
-          </div>
+              <div class="form-group">
+                <label for="currency">Currency</label>
+                <app-custom-dropdown
+                  [options]="getCurrencyOptions()"
+                  [selectedValues]="fund.currency ? [fund.currency] : []"
+                  [multiple]="false"
+                  placeholder="Select Currency"
+                  [active]="!!fund.currency"
+                  [isOpen]="currencyDropdownOpen"
+                  (selectionChange)="onCurrencyChange($event)"
+                  (isOpenChange)="onCurrencyDropdownOpenChange($event)"
+                ></app-custom-dropdown>
+              </div>
 
-          <div class="form-group">
-            <label for="fundSize">Fund Size</label>
-            <input
-              type="number"
-              id="fundSize"
-              [(ngModel)]="fund.fundSize"
-              (ngModelChange)="onFieldChange()"
-              name="fundSize"
-              class="form-input"
-              step="0.01"
-              required
-            />
-          </div>
+              <div class="form-group">
+                <label for="fundSize">Fund Size</label>
+                <input
+                  type="number"
+                  id="fundSize"
+                  [(ngModel)]="fund.fundSize"
+                  (ngModelChange)="onFieldChange()"
+                  name="fundSize"
+                  class="form-input"
+                  step="0.01"
+                  min="0"
+                  required
+                />
+              </div>
 
-          <div class="form-group">
-            <label for="vintage">Vintage Year</label>
-            <input
-              type="number"
-              id="vintage"
-              [(ngModel)]="fund.vintage"
-              (ngModelChange)="onFieldChange()"
-              name="vintage"
-              class="form-input"
-              required
-            />
+              <div class="form-group">
+                <label for="vintage">Vintage Year</label>
+                <input
+                  type="number"
+                  id="vintage"
+                  [(ngModel)]="fund.vintage"
+                  (ngModelChange)="onFieldChange()"
+                  name="vintage"
+                  class="form-input"
+                  min="0"
+                  required
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Strategies -->
-      <div class="form-section">
-        <h3>Strategies</h3>
-        <div class="tag-section">
-          <div class="tags-container" *ngIf="fund.strategies.length > 0">
-            <app-tag
-              *ngFor="let strategy of fund.strategies; let i = index"
-              [text]="strategy"
-              type="strategy"
-              [closable]="true"
-              (close)="removeStrategy(i)"
-            ></app-tag>
-          </div>
-          <div class="tag-dropdown-container">
-            <select
-              id="strategy-dropdown"
-              (change)="addStrategyFromDropdown($event)"
-              class="form-select tag-dropdown"
-            >
-              <option value="">Select a strategy to add</option>
-              <option
-                *ngFor="let option of getAvailableStrategies()"
-                [value]="option"
-              >
-                {{ option }}
-              </option>
-            </select>
+        <!-- Strategies -->
+        <div class="form-section">
+          <div class="info-card">
+            <h2 class="card-title">Investment Strategies</h2>
+            <div class="tag-section">
+              <div class="tags-container" *ngIf="fund.strategies.length > 0">
+                <app-tag
+                  *ngFor="let strategy of fund.strategies; let i = index"
+                  [text]="strategy"
+                  type="strategy"
+                  [closable]="true"
+                  (close)="removeStrategy(i)"
+                ></app-tag>
+              </div>
+              <div class="tag-dropdown-container">
+                <app-custom-dropdown
+                  [options]="getStrategyOptions()"
+                  [selectedValues]="strategySelected"
+                  [multiple]="false"
+                  placeholder="Select a strategy to add"
+                  [active]="false"
+                  [isOpen]="strategyDropdownOpen"
+                  (selectionChange)="addStrategyFromDropdown($event)"
+                  (isOpenChange)="onStrategyDropdownOpenChange($event)"
+                ></app-custom-dropdown>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Geographies -->
-      <div class="form-section">
-        <h3>Geographies</h3>
-        <div class="tag-section">
-          <div class="tags-container" *ngIf="fund.geographies.length > 0">
-            <app-tag
-              *ngFor="let geography of fund.geographies; let i = index"
-              [text]="geography"
-              type="geography"
-              [closable]="true"
-              (close)="removeGeography(i)"
-            ></app-tag>
-          </div>
-          <div class="tag-dropdown-container">
-            <select
-              id="geography-dropdown"
-              (change)="addGeographyFromDropdown($event)"
-              class="form-select tag-dropdown"
-            >
-              <option value="">Select a geography to add</option>
-              <option
-                *ngFor="let option of getAvailableGeographies()"
-                [value]="option"
-              >
-                {{ option }}
-              </option>
-            </select>
+        <!-- Geographies -->
+        <div class="form-section">
+          <div class="info-card">
+            <h2 class="card-title">Geographies</h2>
+            <div class="tag-section">
+              <div class="tags-container" *ngIf="fund.geographies.length > 0">
+                <app-tag
+                  *ngFor="let geography of fund.geographies; let i = index"
+                  [text]="geography"
+                  type="geography"
+                  [closable]="true"
+                  (close)="removeGeography(i)"
+                ></app-tag>
+              </div>
+              <div class="tag-dropdown-container">
+                <app-custom-dropdown
+                  [options]="getGeographyOptions()"
+                  [selectedValues]="geographySelected"
+                  [multiple]="false"
+                  placeholder="Select a geography to add"
+                  [active]="false"
+                  [isOpen]="geographyDropdownOpen"
+                  (selectionChange)="addGeographyFromDropdown($event)"
+                  (isOpenChange)="onGeographyDropdownOpenChange($event)"
+                ></app-custom-dropdown>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Managers -->
-      <div class="form-section">
-        <h3>Managers</h3>
-        <div class="tag-section">
-          <div class="tags-container" *ngIf="fund.managers.length > 0">
-            <app-tag
-              *ngFor="let manager of fund.managers; let i = index"
-              [text]="manager"
-              type="manager"
-              [closable]="true"
-              (close)="removeManager(i)"
-            ></app-tag>
-          </div>
-          <div class="tag-dropdown-container">
-            <select
-              id="manager-dropdown"
-              (change)="addManagerFromDropdown($event)"
-              class="form-select tag-dropdown"
-            >
-              <option value="">Select a manager to add</option>
-              <option
-                *ngFor="let option of getAvailableManagers()"
-                [value]="option"
-              >
-                {{ option }}
-              </option>
-            </select>
+        <!-- Managers -->
+        <div class="form-section">
+          <div class="info-card">
+            <h2 class="card-title">Fund Managers</h2>
+            <div class="tag-section">
+              <div class="tags-container" *ngIf="fund.managers.length > 0">
+                <app-tag
+                  *ngFor="let manager of fund.managers; let i = index"
+                  [text]="manager"
+                  type="manager"
+                  [closable]="true"
+                  (close)="removeManager(i)"
+                ></app-tag>
+              </div>
+              <div class="tag-dropdown-container">
+                <app-custom-dropdown
+                  [options]="getManagerOptions()"
+                  [selectedValues]="managerSelected"
+                  [multiple]="false"
+                  placeholder="Select a manager to add"
+                  [active]="false"
+                  [isOpen]="managerDropdownOpen"
+                  (selectionChange)="addManagerFromDropdown($event)"
+                  (isOpenChange)="onManagerDropdownOpenChange($event)"
+                ></app-custom-dropdown>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Description -->
-      <div class="form-section">
-        <h3>Description</h3>
-        <div class="form-group">
-          <textarea
-            id="description"
-            [(ngModel)]="fund.description"
-            (ngModelChange)="onFieldChange()"
-            name="description"
-            class="form-textarea"
-            rows="4"
-            placeholder="Enter fund description"
-          ></textarea>
+        <!-- Description -->
+        <div class="form-section">
+          <div class="info-card">
+            <h2 class="card-title">Description</h2>
+            <div class="form-group">
+              <textarea
+                id="description"
+                [(ngModel)]="fund.description"
+                (ngModelChange)="onFieldChange()"
+                name="description"
+                class="form-textarea"
+                rows="4"
+                placeholder="Enter fund description"
+              ></textarea>
+            </div>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>

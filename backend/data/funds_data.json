@@ -2,8 +2,7 @@
   {
     "name": "KIM Fund 3",
     "strategies": [
-      "Venture Capital",
-      "Hedge Fund"
+      "Venture Capital"
     ],
     "geographies": [
       "Global",
@@ -11,11 +10,11 @@
       "Asia"
     ],
     "currency": "CAD",
-    "fundSize": 1199,
+    "fundSize": 1199.02,
     "vintage": 2025,
     "managers": [
       "Silver Rock",
-      "Blue Lake Fund"
+      "Alpha Capital"
     ],
     "description": "I am a test\n"
   },
@@ -571,27 +570,6 @@
       "Silver Rock"
     ],
     "description": "Hedge fund with a long/short equity strategy."
-  },
-  {
-    "name": "JVS Fund 69",
-    "strategies": [
-      "Distressed Assets",
-      "Infrastructure",
-      "Venture Capital"
-    ],
-    "geographies": [
-      "Middle East",
-      "Global"
-    ],
-    "currency": "CNY",
-    "fundSize": 351.02,
-    "vintage": 2012,
-    "managers": [
-      "Silver Rock",
-      "Apex Ventures",
-      "Alpha Capital"
-    ],
-    "description": "Invests in renewable energy infrastructure."
   },
   {
     "name": "AQH Fund 14",

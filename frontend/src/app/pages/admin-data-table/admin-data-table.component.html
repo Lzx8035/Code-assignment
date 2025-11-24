@@ -6,6 +6,7 @@
   <app-filter-panel
     [filters]="filters"
     [filterMeta]="filterMeta"
+    [loading]="loading"
     (filterChange)="onFilterChange($event)"
     (resetFilters)="onResetFilters()"
   ></app-filter-panel>
@@ -23,8 +24,9 @@
   </div>
 
   <app-funds-table
-    *ngIf="!loading && funds.length > 0"
+    *ngIf="funds.length > 0"
     [funds]="funds"
+    [loading]="loading"
     (editFund)="onEditFund($event)"
     (deleteFund)="onDeleteFund($event)"
   ></app-funds-table>

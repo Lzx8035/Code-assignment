@@ -1,5 +1,8 @@
-<div class="table-wrapper">
-  <table class="data-table">
+<div class="table-wrapper" [class.loading]="loading">
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="loading-spinner-large"></div>
+  </div>
+  <table class="data-table" [class.loading-table]="loading">
     <thead>
       <tr>
         <th>Name</th>
@@ -53,6 +56,7 @@
             class="btn-icon btn-edit"
             (click)="onEdit(fund.name)"
             title="Edit fund"
+            [disabled]="loading"
           >
             <app-icon name="pencil" [size]="16"></app-icon>
           </button>
@@ -60,6 +64,7 @@
             class="btn-icon btn-delete"
             (click)="onDelete(fund.name)"
             title="Delete fund"
+            [disabled]="loading"
           >
             <app-icon name="trash" [size]="16"></app-icon>
           </button>

@@ -50,6 +50,102 @@ You are expected to create at least **three components**:
     - CC: team@seclink.com
 
 ### Notes
-- Name:
-- Email:
-- Message: 
+- Name: Lea Liang
+- Email: lzx8035@gmail.com
+- Message: Here is a brief intro about my coding assignment 😀
+
+
+# Funds Management Dashboard (Angular + Node.js)
+
+## 📂 Tech Stack
+### Frontend
+- Angular
+- TypeScript
+
+### Backend
+- Node.js + Express
+- File-based storage (`funds_data.json`)
+- REST API
+- Postman documentation
+
+---
+
+## 🚀 Features
+
+### Frontend Features
+- Three main views:
+  - **Admin Data Table View**
+  - **User Facing Detail View**
+  - **Admin Edit View**
+- Dynamic filters:
+  - strategies / geographies / currencies from `/api/funds/meta`
+- Backend-driven:
+  - filtering  
+  - sorting  
+  - pagination (page, pageSize, jump to page)
+- Filters synced to URL params (state preserved after page refresh)
+- Auto-save in Edit View (debounced PUT)
+- Delete action with confirmation
+- Validation for numeric filter ranges
+- Toast notifications (data count, save status)
+- Loading / error / empty states
+- Responsive layout
+
+---
+
+## 🗄️ Backend Features
+
+- REST API built with Node.js + Express
+- Reads and writes to `funds_data.json`
+- Backend handles all filtering, sorting, and pagination
+- Metadata endpoint for dynamic dropdown options
+- All endpoints tested with Postman (documentation link included)
+
+---
+
+## 🔌 API Endpoints
+
+### `GET /api/funds/meta`
+Returns unique lists for:
+- `strategies`
+- `geographies`
+- `currencies`
+
+Used by filter components.
+
+---
+
+### `GET /api/funds`
+Returns all funds.
+
+Supports query params:
+- `page`
+- `pageSize`
+- `sortField`
+- `sortOrder`
+- filter fields (strategy, geography, currency, etc.)
+
+---
+
+### `GET /api/funds/:name`
+Returns a single fund by name.  
+Used in User Detail View + Admin Edit View.
+
+---
+
+### `PUT /api/funds/:name`
+Updates a single fund.  
+Changes are saved back to the JSON file (used by auto-save).
+
+---
+
+### `DELETE /api/funds/:name`
+Deletes a fund and writes the updated list back to JSON.
+
+---
+
+## 📘 API Documentation (Postman)
+View all API requests and examples:
+
+**Postman Web Link:**  
+https://supply-architect-7804003-3576417.postman.co/workspace/Lea-Liang's-Workspace~110f636f-bdfa-4e70-8f58-d1c8b2f89384/collection/47064750-000079b3-a1d5-48ee-b798-f2fd82ce7e90?action=share&creator=47064750&active-environment=47064750-e89e2841-ed36-4513-96b3-d73c3a577e11

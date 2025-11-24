@@ -3,6 +3,47 @@
   border: 1px solid #ddd;
   border-radius: 12px;
   background-color: white;
+  position: relative;
+
+  &.loading {
+    pointer-events: none;
+  }
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.loading-spinner-large {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #2d3748;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-table {
+  opacity: 0.5;
 }
 
 .data-table {
@@ -11,14 +52,14 @@
   font-size: 0.9rem;
 
   thead {
-    background-color: #f8f9fa;
+    background-color: rgba(58, 168, 197, 0.1);
 
     th {
       padding: 1rem 0.75rem;
       text-align: left;
       font-weight: 600;
       color: #333;
-      border-bottom: 1px solid #dee2e6;
+      border-bottom: 1px solid rgba(58, 168, 197, 0.2);
       white-space: nowrap;
     }
 
@@ -70,13 +111,13 @@
 .actions-header {
   text-align: center;
   width: 80px;
-  background-color: #f8f9fa;
+  background-color: rgba(58, 168, 197, 0.1);
 }
 
 .actions-cell {
   text-align: center;
   white-space: nowrap;
-  background-color: #f8f9fa;
+  background-color: rgba(58, 168, 197, 0.1);
 }
 
 .btn-icon {
@@ -112,7 +153,13 @@
     }
   }
 
-  &:active {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &:active:not(:disabled) {
     transform: scale(0.95);
   }
 }

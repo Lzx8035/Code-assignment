@@ -24,6 +24,7 @@ export interface Fund {
 })
 export class FundsTableComponent {
   @Input() funds: Fund[] = [];
+  @Input() loading: boolean = false;
   @Output() editFund = new EventEmitter<string>();
   @Output() deleteFund = new EventEmitter<string>();
 

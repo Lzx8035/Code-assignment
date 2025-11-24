@@ -3,9 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { Fund } from '../../components/funds-table/funds-table.component';
 import { TagComponent } from '../../components/tag/tag.component';
 import { IconComponent } from '../../components/icon/icon.component';
+import {
+  CustomDropdownComponent,
+  DropdownOption,
+} from '../../components/custom-dropdown/custom-dropdown.component';
 
 interface FilterMeta {
   strategies: string[];
@@ -23,6 +28,7 @@ interface FilterMeta {
     RouterModule,
     TagComponent,
     IconComponent,
+    CustomDropdownComponent,
   ],
   templateUrl: './admin-edit.component.html',
   styleUrl: './admin-edit.component.scss',
@@ -44,11 +50,19 @@ export class AdminEditComponent implements OnInit {
     currencies: [],
     managers: [],
   };
+  strategyDropdownOpen = false;
+  geographyDropdownOpen = false;
+  managerDropdownOpen = false;
+  currencyDropdownOpen = false;
+  strategySelected: string[] = [];
+  geographySelected: string[] = [];
+  managerSelected: string[] = [];
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -115,6 +129,28 @@ export class AdminEditComponent implements OnInit {
       return;
     }
 
+    // Validate Fund Size - cannot be negative
+    if (this.fund.fundSize !== null && this.fund.fundSize !== undefined) {
+      if (this.fund.fundSize < 0) {
+        this.fund.fundSize = 0;
+        this.toastr.warning(
+          'Fund Size cannot be negative. Value set to 0.',
+          'Warning'
+        );
+      }
+    }
+
+    // Validate Vintage Year - cannot be negative
+    if (this.fund.vintage !== null && this.fund.vintage !== undefined) {
+      if (this.fund.vintage < 0) {
+        this.fund.vintage = 0;
+        this.toastr.warning(
+          'Vintage Year cannot be negative. Value set to 0.',
+          'Warning'
+        );
+      }
+    }
+
     // Clear existing timer
     if (this.autoSaveTimer) {
       clearTimeout(this.autoSaveTimer);
@@ -143,10 +179,7 @@ export class AdminEditComponent implements OnInit {
           this.fund = data;
           this.originalFund = { ...data };
           this.saving = false;
-          this.success = 'Changes saved successfully!';
-          setTimeout(() => {
-            this.success = null;
-          }, 3000);
+          this.toastr.success('Changes saved successfully!', 'Saved');
         },
         error: (err) => {
           this.error = 'Failed to save changes. Please try again.';
@@ -199,11 +232,75 @@ export class AdminEditComponent implements OnInit {
     );
   }
 
+  // Get dropdown options
+  getCurrencyOptions(): DropdownOption[] {
+    if (!this.filterMeta || !this.filterMeta.currencies) {
+      return [];
+    }
+    return this.filterMeta.currencies.map((currency) => ({
+      value: currency,
+      label: currency,
+    }));
+  }
+
+  getStrategyOptions(): DropdownOption[] {
+    return this.getAvailableStrategies().map((strategy) => ({
+      value: strategy,
+      label: strategy,
+    }));
+  }
+
+  getGeographyOptions(): DropdownOption[] {
+    return this.getAvailableGeographies().map((geography) => ({
+      value: geography,
+      label: geography,
+    }));
+  }
+
+  getManagerOptions(): DropdownOption[] {
+    return this.getAvailableManagers().map((manager) => ({
+      value: manager,
+      label: manager,
+    }));
+  }
+
+  // Handle currency selection
+  onCurrencyChange(selectedValues: string[]): void {
+    if (!this.fund || selectedValues.length === 0) return;
+    this.fund.currency = selectedValues[0];
+    this.onFieldChange();
+  }
+
+  // Handle dropdown open state
+  onCurrencyDropdownOpenChange(isOpen: boolean): void {
+    this.currencyDropdownOpen = isOpen;
+  }
+
+  onStrategyDropdownOpenChange(isOpen: boolean): void {
+    this.strategyDropdownOpen = isOpen;
+    if (!isOpen) {
+      this.strategySelected = [];
+    }
+  }
+
+  onGeographyDropdownOpenChange(isOpen: boolean): void {
+    this.geographyDropdownOpen = isOpen;
+    if (!isOpen) {
+      this.geographySelected = [];
+    }
+  }
+
+  onManagerDropdownOpenChange(isOpen: boolean): void {
+    this.managerDropdownOpen = isOpen;
+    if (!isOpen) {
+      this.managerSelected = [];
+    }
+  }
+
   // Add selected option from dropdown
-  addStrategyFromDropdown(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const selectedValue = target.value;
-    if (!this.fund || !selectedValue) return;
+  addStrategyFromDropdown(selectedValues: string[]): void {
+    if (!this.fund || selectedValues.length === 0) return;
+    const selectedValue = selectedValues[0];
     if (!this.fund.strategies) {
       this.fund.strategies = [];
     }
@@ -211,14 +308,14 @@ export class AdminEditComponent implements OnInit {
       this.fund.strategies.push(selectedValue);
       this.onFieldChange();
     }
-    // Reset dropdown
-    target.value = '';
+    // Reset dropdown selection
+    this.strategySelected = [];
+    this.strategyDropdownOpen = false;
   }
 
-  addGeographyFromDropdown(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const selectedValue = target.value;
-    if (!this.fund || !selectedValue) return;
+  addGeographyFromDropdown(selectedValues: string[]): void {
+    if (!this.fund || selectedValues.length === 0) return;
+    const selectedValue = selectedValues[0];
     if (!this.fund.geographies) {
       this.fund.geographies = [];
     }
@@ -226,14 +323,14 @@ export class AdminEditComponent implements OnInit {
       this.fund.geographies.push(selectedValue);
       this.onFieldChange();
     }
-    // Reset dropdown
-    target.value = '';
+    // Reset dropdown selection
+    this.geographySelected = [];
+    this.geographyDropdownOpen = false;
   }
 
-  addManagerFromDropdown(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const selectedValue = target.value;
-    if (!this.fund || !selectedValue) return;
+  addManagerFromDropdown(selectedValues: string[]): void {
+    if (!this.fund || selectedValues.length === 0) return;
+    const selectedValue = selectedValues[0];
     if (!this.fund.managers) {
       this.fund.managers = [];
     }
@@ -241,11 +338,20 @@ export class AdminEditComponent implements OnInit {
       this.fund.managers.push(selectedValue);
       this.onFieldChange();
     }
-    // Reset dropdown
-    target.value = '';
+    // Reset dropdown selection
+    this.managerSelected = [];
+    this.managerDropdownOpen = false;
   }
 
   goBack(): void {
     this.router.navigate(['/admin/funds']);
+  }
+
+  finishEditing(): void {
+    if (!this.fundName) {
+      return;
+    }
+    const encodedName = encodeURIComponent(this.fundName);
+    this.router.navigate(['/funds', encodedName]);
   }
 }

@@ -1,4 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Injector,
+  PLATFORM_ID,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -19,19 +26,44 @@ import { IconComponent } from '../../components/icon/icon.component';
   styleUrl: './user-facing-data.component.scss',
   standalone: true,
 })
-export class UserFacingDataComponent implements OnInit {
+export class UserFacingDataComponent implements OnInit, OnDestroy {
   fund: Fund | null = null;
   loading = false;
   error: string | null = null;
   fundName: string | null = null;
+  private readonly platformId: Object;
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private router: Router
-  ) {}
+    private router: Router,
+    private injector: Injector
+  ) {
+    this.platformId = this.injector.get(PLATFORM_ID);
+  }
 
   ngOnInit(): void {
+    // Disable body scroll (only in browser and on larger screens)
+    if (isPlatformBrowser(this.platformId)) {
+      const checkScreenSize = () => {
+        if (window.innerWidth > 768) {
+          document.body.style.overflow = 'hidden';
+          document.documentElement.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+          document.documentElement.style.overflow = '';
+        }
+      };
+
+      checkScreenSize();
+      window.addEventListener('resize', checkScreenSize);
+
+      // Store cleanup function
+      (this as any)._cleanupResize = () => {
+        window.removeEventListener('resize', checkScreenSize);
+      };
+    }
+
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
@@ -41,6 +73,19 @@ export class UserFacingDataComponent implements OnInit {
         this.error = 'Fund ID is required';
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    // Re-enable body scroll when component is destroyed (only in browser)
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+
+      // Clean up resize listener
+      if ((this as any)._cleanupResize) {
+        (this as any)._cleanupResize();
+      }
+    }
   }
 
   loadFund(): void {

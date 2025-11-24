@@ -70,6 +70,7 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
     currencies: [],
     managers: [],
   };
+  @Input() loading: boolean = false;
 
   @Output() filterChange = new EventEmitter<FilterOptions>();
   @Output() resetFilters = new EventEmitter<void>();
@@ -94,6 +95,17 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
   }
 
   onSearch(): void {
+    // Validate Fund Size - cannot be negative
+    if (this.filters.minFundSize !== null && this.filters.minFundSize < 0) {
+      alert('Fund Size (Min) cannot be negative.');
+      return;
+    }
+
+    if (this.filters.maxFundSize !== null && this.filters.maxFundSize < 0) {
+      alert('Fund Size (Max) cannot be negative.');
+      return;
+    }
+
     // Validate Fund Size range
     if (
       this.filters.minFundSize !== null &&
@@ -103,6 +115,17 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
       alert(
         'Invalid Fund Size range: Minimum value must be less than or equal to Maximum value.'
       );
+      return;
+    }
+
+    // Validate Vintage Year - cannot be negative
+    if (this.filters.minVintage !== null && this.filters.minVintage < 0) {
+      alert('Vintage Year (Min) cannot be negative.');
+      return;
+    }
+
+    if (this.filters.maxVintage !== null && this.filters.maxVintage < 0) {
+      alert('Vintage Year (Max) cannot be negative.');
       return;
     }
 
