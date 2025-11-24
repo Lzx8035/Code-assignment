@@ -65,11 +65,17 @@
   font-size: 0.9rem;
   transition: all 0.2s;
   background-color: white;
+  color: #333;
 
   &:focus {
     outline: none;
     border-color: #3aa8c5;
     box-shadow: 0 0 0 3px rgba(58, 168, 197, 0.1);
+    color: #333;
+  }
+
+  &::placeholder {
+    color: #999;
   }
 }
 

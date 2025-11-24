@@ -9,6 +9,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: white;
+  color: #333;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -23,6 +24,7 @@
   &.active {
     border-color: #3aa8c5;
     background-color: #f0f7ff;
+    color: #333;
   }
 
   .dropdown-arrow {
@@ -49,6 +51,7 @@
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
+  color: #333;
 }
 
 .dropdown-option {
@@ -58,9 +61,12 @@
   padding: 0.6rem 0.75rem;
   cursor: pointer;
   transition: background-color 0.15s;
+  background-color: white;
+  color: #333;
 
   &:hover {
     background-color: #f8f9fa;
+    color: #333;
   }
 
   &.single-select {
@@ -73,6 +79,7 @@
 
   &.selected {
     background-color: #e7f3ff;
+    color: #333;
   }
 
   input[type="checkbox"] {

@@ -1,2 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @import "ngx-toastr/toastr";
+
+html,
+body {
+  background-color: white;
+  color: #333;
+}
+
+app-root {
+  display: block;
+  background-color: white;
+  min-height: 100vh;
+}

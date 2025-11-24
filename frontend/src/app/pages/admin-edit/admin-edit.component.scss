@@ -36,7 +36,7 @@ $success-border: #bbf7d0;
 .admin-edit-container {
   height: 100vh;
   overflow: hidden;
-  background-color: $background-light;
+  background-color: white;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -368,6 +368,7 @@ $success-border: #bbf7d0;
   &:focus {
     outline: none;
     border-color: $accent-blue;
+    color: $text-primary;
   }
 
   &::placeholder {
