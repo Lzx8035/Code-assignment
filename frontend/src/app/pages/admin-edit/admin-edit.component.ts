@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Fund } from '../admin-data-table/admin-data-table.component';
+import { Fund } from '../../components/funds-table/funds-table.component';
+import { TagComponent } from '../../components/tag/tag.component';
+import { IconComponent } from '../../components/icon/icon.component';
 
 interface FilterMeta {
   strategies: string[];
@@ -14,7 +16,14 @@ interface FilterMeta {
 
 @Component({
   selector: 'app-admin-edit',
-  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    RouterModule,
+    TagComponent,
+    IconComponent,
+  ],
   templateUrl: './admin-edit.component.html',
   styleUrl: './admin-edit.component.scss',
   standalone: true,
@@ -147,28 +156,10 @@ export class AdminEditComponent implements OnInit {
       });
   }
 
-  addStrategy(): void {
-    if (!this.fund) return;
-    if (!this.fund.strategies) {
-      this.fund.strategies = [];
-    }
-    // Add empty string, user will select from dropdown
-    this.fund.strategies.push('');
-  }
-
   removeStrategy(index: number): void {
     if (!this.fund) return;
     this.fund.strategies.splice(index, 1);
     this.onFieldChange();
-  }
-
-  addGeography(): void {
-    if (!this.fund) return;
-    if (!this.fund.geographies) {
-      this.fund.geographies = [];
-    }
-    // Add empty string, user will select from dropdown
-    this.fund.geographies.push('');
   }
 
   removeGeography(index: number): void {
@@ -177,19 +168,81 @@ export class AdminEditComponent implements OnInit {
     this.onFieldChange();
   }
 
-  addManager(): void {
-    if (!this.fund) return;
-    if (!this.fund.managers) {
-      this.fund.managers = [];
-    }
-    // Add empty string, user will select from dropdown
-    this.fund.managers.push('');
-  }
-
   removeManager(index: number): void {
     if (!this.fund) return;
     this.fund.managers.splice(index, 1);
     this.onFieldChange();
+  }
+
+  // Get available options that are not already selected
+  getAvailableStrategies(): string[] {
+    if (!this.fund) return this.filterMeta.strategies;
+    const fund = this.fund;
+    return this.filterMeta.strategies.filter(
+      (strategy) => !fund.strategies.includes(strategy)
+    );
+  }
+
+  getAvailableGeographies(): string[] {
+    if (!this.fund) return this.filterMeta.geographies;
+    const fund = this.fund;
+    return this.filterMeta.geographies.filter(
+      (geography) => !fund.geographies.includes(geography)
+    );
+  }
+
+  getAvailableManagers(): string[] {
+    if (!this.fund) return this.filterMeta.managers;
+    const fund = this.fund;
+    return this.filterMeta.managers.filter(
+      (manager) => !fund.managers.includes(manager)
+    );
+  }
+
+  // Add selected option from dropdown
+  addStrategyFromDropdown(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const selectedValue = target.value;
+    if (!this.fund || !selectedValue) return;
+    if (!this.fund.strategies) {
+      this.fund.strategies = [];
+    }
+    if (!this.fund.strategies.includes(selectedValue)) {
+      this.fund.strategies.push(selectedValue);
+      this.onFieldChange();
+    }
+    // Reset dropdown
+    target.value = '';
+  }
+
+  addGeographyFromDropdown(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const selectedValue = target.value;
+    if (!this.fund || !selectedValue) return;
+    if (!this.fund.geographies) {
+      this.fund.geographies = [];
+    }
+    if (!this.fund.geographies.includes(selectedValue)) {
+      this.fund.geographies.push(selectedValue);
+      this.onFieldChange();
+    }
+    // Reset dropdown
+    target.value = '';
+  }
+
+  addManagerFromDropdown(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const selectedValue = target.value;
+    if (!this.fund || !selectedValue) return;
+    if (!this.fund.managers) {
+      this.fund.managers = [];
+    }
+    if (!this.fund.managers.includes(selectedValue)) {
+      this.fund.managers.push(selectedValue);
+      this.onFieldChange();
+    }
+    // Reset dropdown
+    target.value = '';
   }
 
   goBack(): void {

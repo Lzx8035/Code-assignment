@@ -1,7 +1,8 @@
 <div class="admin-edit-container">
   <header class="header">
     <button class="btn btn-back" (click)="goBack()">
-      ← Back to Funds List
+      <app-icon name="arrow-left" [size]="16"></app-icon>
+      Back to Funds List
     </button>
     <h1>Edit Fund</h1>
   </header>
@@ -25,7 +26,7 @@
       </div>
     </div>
 
-    <form (ngSubmit)="saveFund()" class="fund-form">
+    <form class="fund-form">
       <!-- Basic Information -->
       <div class="form-section">
         <h3>Basic Information</h3>
@@ -45,15 +46,22 @@
 
           <div class="form-group">
             <label for="currency">Currency</label>
-            <input
-              type="text"
+            <select
               id="currency"
               [(ngModel)]="fund.currency"
               (ngModelChange)="onFieldChange()"
               name="currency"
-              class="form-input"
+              class="form-select"
               required
-            />
+            >
+              <option value="">Select Currency</option>
+              <option
+                *ngFor="let currency of filterMeta.currencies"
+                [value]="currency"
+              >
+                {{ currency }}
+              </option>
+            </select>
           </div>
 
           <div class="form-group">
@@ -88,123 +96,93 @@
       <!-- Strategies -->
       <div class="form-section">
         <h3>Strategies</h3>
-        <div class="array-input-group">
-          <div
-            *ngFor="let strategy of fund.strategies; let i = index"
-            class="array-item"
-          >
+        <div class="tag-section">
+          <div class="tags-container" *ngIf="fund.strategies.length > 0">
+            <app-tag
+              *ngFor="let strategy of fund.strategies; let i = index"
+              [text]="strategy"
+              type="strategy"
+              [closable]="true"
+              (close)="removeStrategy(i)"
+            ></app-tag>
+          </div>
+          <div class="tag-dropdown-container">
             <select
-              [(ngModel)]="fund.strategies[i]"
-              (ngModelChange)="onFieldChange()"
-              [name]="'strategy-' + i"
-              class="form-select"
+              id="strategy-dropdown"
+              (change)="addStrategyFromDropdown($event)"
+              class="form-select tag-dropdown"
             >
-              <option value="">Select a strategy</option>
+              <option value="">Select a strategy to add</option>
               <option
-                *ngFor="let option of filterMeta.strategies"
+                *ngFor="let option of getAvailableStrategies()"
                 [value]="option"
               >
                 {{ option }}
               </option>
             </select>
-            <button
-              type="button"
-              class="btn btn-icon btn-remove"
-              (click)="removeStrategy(i)"
-              title="Remove strategy"
-            >
-              ×
-            </button>
           </div>
-          <button
-            type="button"
-            class="btn btn-secondary btn-add"
-            (click)="addStrategy()"
-          >
-            + Add Strategy
-          </button>
         </div>
       </div>
 
       <!-- Geographies -->
       <div class="form-section">
         <h3>Geographies</h3>
-        <div class="array-input-group">
-          <div
-            *ngFor="let geography of fund.geographies; let i = index"
-            class="array-item"
-          >
+        <div class="tag-section">
+          <div class="tags-container" *ngIf="fund.geographies.length > 0">
+            <app-tag
+              *ngFor="let geography of fund.geographies; let i = index"
+              [text]="geography"
+              type="geography"
+              [closable]="true"
+              (close)="removeGeography(i)"
+            ></app-tag>
+          </div>
+          <div class="tag-dropdown-container">
             <select
-              [(ngModel)]="fund.geographies[i]"
-              (ngModelChange)="onFieldChange()"
-              [name]="'geography-' + i"
-              class="form-select"
+              id="geography-dropdown"
+              (change)="addGeographyFromDropdown($event)"
+              class="form-select tag-dropdown"
             >
-              <option value="">Select a geography</option>
+              <option value="">Select a geography to add</option>
               <option
-                *ngFor="let option of filterMeta.geographies"
+                *ngFor="let option of getAvailableGeographies()"
                 [value]="option"
               >
                 {{ option }}
               </option>
             </select>
-            <button
-              type="button"
-              class="btn btn-icon btn-remove"
-              (click)="removeGeography(i)"
-              title="Remove geography"
-            >
-              ×
-            </button>
           </div>
-          <button
-            type="button"
-            class="btn btn-secondary btn-add"
-            (click)="addGeography()"
-          >
-            + Add Geography
-          </button>
         </div>
       </div>
 
       <!-- Managers -->
       <div class="form-section">
         <h3>Managers</h3>
-        <div class="array-input-group">
-          <div
-            *ngFor="let manager of fund.managers; let i = index"
-            class="array-item"
-          >
+        <div class="tag-section">
+          <div class="tags-container" *ngIf="fund.managers.length > 0">
+            <app-tag
+              *ngFor="let manager of fund.managers; let i = index"
+              [text]="manager"
+              type="manager"
+              [closable]="true"
+              (close)="removeManager(i)"
+            ></app-tag>
+          </div>
+          <div class="tag-dropdown-container">
             <select
-              [(ngModel)]="fund.managers[i]"
-              (ngModelChange)="onFieldChange()"
-              [name]="'manager-' + i"
-              class="form-select"
+              id="manager-dropdown"
+              (change)="addManagerFromDropdown($event)"
+              class="form-select tag-dropdown"
             >
-              <option value="">Select a manager</option>
+              <option value="">Select a manager to add</option>
               <option
-                *ngFor="let option of filterMeta.managers"
+                *ngFor="let option of getAvailableManagers()"
                 [value]="option"
               >
                 {{ option }}
               </option>
             </select>
-            <button
-              type="button"
-              class="btn btn-icon btn-remove"
-              (click)="removeManager(i)"
-              title="Remove manager"
-            >
-              ×
-            </button>
           </div>
-          <button
-            type="button"
-            class="btn btn-secondary btn-add"
-            (click)="addManager()"
-          >
-            + Add Manager
-          </button>
         </div>
       </div>
 
@@ -222,16 +200,6 @@
             placeholder="Enter fund description"
           ></textarea>
         </div>
-      </div>
-
-      <!-- Form Actions -->
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="goBack()">
-          Cancel
-        </button>
-        <button type="submit" class="btn btn-primary" [disabled]="saving">
-          {{ saving ? "Saving..." : "Save Changes" }}
-        </button>
       </div>
     </form>
   </div>

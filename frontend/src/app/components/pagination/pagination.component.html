@@ -1,0 +1,211 @@
+<div class="pagination-container">
+  <!-- Desktop layout -->
+  <div class="desktop-layout">
+    <!-- Total items display -->
+    <div class="total-items">
+      <span class="text-sm">Total {{ totalItems }} items</span>
+    </div>
+
+    <!-- Page size selector -->
+    <div class="page-size-selector">
+      <span class="text-sm">Page size</span>
+      <div class="select-wrapper">
+        <select
+          [value]="pageSize"
+          (change)="handlePageSizeChange($event)"
+          class="page-size-select"
+        >
+          @for (size of pageSizeOptions; track size) {
+          <option [value]="size">{{ size }}</option>
+          }
+        </select>
+        <svg
+          class="select-arrow"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Page navigation -->
+    <div class="page-navigation">
+      <button
+        type="button"
+        (click)="handlePrev()"
+        [disabled]="currentPage === 1"
+        class="nav-button"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
+
+      @for (page of getPageNumbers(); track $index) { @if (page === '...') {
+      <span class="ellipsis">{{ page }}</span>
+      } @else {
+      <button
+        type="button"
+        (click)="handlePageClick(page)"
+        [class.active]="page === currentPage"
+        class="page-button"
+      >
+        {{ page }}
+      </button>
+      } }
+
+      <button
+        type="button"
+        (click)="handleNext()"
+        [disabled]="currentPage === totalPages"
+        class="nav-button"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Jump to page -->
+    <div class="jump-to-page">
+      <span class="text-sm">Go to</span>
+      <input
+        type="number"
+        [(ngModel)]="jumpToPage"
+        (keypress)="handleJumpToPageKeyPress($event)"
+        [min]="1"
+        [max]="totalPages"
+        class="jump-input"
+      />
+      <span class="text-sm">/ {{ totalPages }} pages, press Enter</span>
+    </div>
+  </div>
+
+  <!-- Mobile layout -->
+  <div class="mobile-layout">
+    <!-- Mobile header: total items and page size -->
+    <div class="mobile-header">
+      <span class="text-sm">Total {{ totalItems }} items</span>
+      <div class="mobile-page-size">
+        <span class="text-sm">Per page</span>
+        <div class="select-wrapper">
+          <select
+            [value]="pageSize"
+            (change)="handlePageSizeChange($event)"
+            class="page-size-select mobile-select"
+          >
+            @for (size of pageSizeOptions; track size) {
+            <option [value]="size">{{ size }}</option>
+            }
+          </select>
+          <svg
+            class="select-arrow mobile-arrow"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile navigation -->
+    <div class="mobile-navigation">
+      <button
+        type="button"
+        (click)="handlePrev()"
+        [disabled]="currentPage === 1"
+        class="nav-button mobile-nav-button"
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
+
+      @for (page of getMobilePageNumbers(); track $index) {
+      <button
+        type="button"
+        (click)="handlePageClick(page)"
+        [class.active]="page === currentPage"
+        class="page-button mobile-page-button"
+      >
+        {{ page }}
+      </button>
+      }
+
+      <button
+        type="button"
+        (click)="handleNext()"
+        [disabled]="currentPage === totalPages"
+        class="nav-button mobile-nav-button"
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile jump to page -->
+    <div class="mobile-jump">
+      <span class="text-sm">Go to</span>
+      <input
+        type="number"
+        [(ngModel)]="jumpToPage"
+        (keypress)="handleJumpToPageKeyPress($event)"
+        [min]="1"
+        [max]="totalPages"
+        class="jump-input mobile-jump-input"
+      />
+      <span class="text-sm">/ {{ totalPages }} pages, press Enter</span>
+    </div>
+  </div>
+</div>

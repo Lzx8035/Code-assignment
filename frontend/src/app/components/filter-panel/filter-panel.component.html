@@ -1,0 +1,257 @@
+<div class="filters-panel">
+  <div class="filters-header">
+    <h3>Filter & Search</h3>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="onSearch()">Search</button>
+      <button class="btn btn-secondary" (click)="onReset()">Reset</button>
+    </div>
+  </div>
+
+  <div class="filters-grid">
+    <!-- Name Search -->
+    <div class="filter-group">
+      <label>Fund Name</label>
+      <input
+        type="text"
+        [(ngModel)]="filters.name"
+        (keyup.enter)="onSearch()"
+        placeholder="Search by name..."
+        class="form-input"
+      />
+    </div>
+
+    <!-- Currency -->
+    <div class="filter-group">
+      <label>Currency</label>
+      <select [(ngModel)]="filters.currency" class="form-select">
+        <option value="">All Currencies</option>
+        <option
+          *ngFor="let currency of filterMeta.currencies"
+          [value]="currency"
+        >
+          {{ currency }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Fund Size Range -->
+    <div class="filter-group">
+      <label>Fund Size (Min)</label>
+      <input
+        type="number"
+        [(ngModel)]="filters.minFundSize"
+        placeholder="Min"
+        class="form-input"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label>Fund Size (Max)</label>
+      <input
+        type="number"
+        [(ngModel)]="filters.maxFundSize"
+        placeholder="Max"
+        class="form-input"
+      />
+    </div>
+
+    <!-- Vintage Range -->
+    <div class="filter-group">
+      <label>Vintage Year (Min)</label>
+      <input
+        type="number"
+        [(ngModel)]="filters.minVintage"
+        placeholder="Min Year"
+        class="form-input"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label>Vintage Year (Max)</label>
+      <input
+        type="number"
+        [(ngModel)]="filters.maxVintage"
+        placeholder="Max Year"
+        class="form-input"
+      />
+    </div>
+
+    <!-- Sort Options -->
+    <div class="filter-group">
+      <label>Sort By</label>
+      <select [(ngModel)]="filters.sortBy" class="form-select">
+        <option value="">No Sorting</option>
+        <option value="name">Name</option>
+        <option value="fundSize">Fund Size</option>
+        <option value="vintage">Vintage</option>
+      </select>
+    </div>
+
+    <div class="filter-group" *ngIf="filters.sortBy">
+      <label>Sort Order</label>
+      <select [(ngModel)]="filters.sortOrder" class="form-select">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Multi-select Dropdowns -->
+  <div class="multi-select-section">
+    <div class="multi-select-group">
+      <label>Strategies</label>
+      <div class="multi-select-dropdown">
+        <button
+          class="multi-select-button"
+          type="button"
+          [class.active]="filters.strategies.length > 0"
+          (click)="toggleStrategiesDropdown($event)"
+        >
+          {{
+            filters.strategies.length > 0
+              ? filters.strategies.length + " selected"
+              : "Select Strategies"
+          }}
+          <app-icon
+            name="chevron-down"
+            [size]="12"
+            className="dropdown-arrow"
+            [ngClass]="{ open: showStrategiesDropdown }"
+          ></app-icon>
+        </button>
+        <div
+          class="multi-select-options"
+          *ngIf="showStrategiesDropdown"
+          (click)="$event.stopPropagation()"
+        >
+          <label
+            *ngFor="let strategy of filterMeta.strategies"
+            class="multi-select-option"
+          >
+            <input
+              type="checkbox"
+              [checked]="filters.strategies.includes(strategy)"
+              (change)="toggleStrategy(strategy)"
+            />
+            <span>{{ strategy }}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="multi-select-group">
+      <label>Geographies</label>
+      <div class="multi-select-dropdown">
+        <button
+          class="multi-select-button"
+          type="button"
+          [class.active]="filters.geographies.length > 0"
+          (click)="toggleGeographiesDropdown($event)"
+        >
+          {{
+            filters.geographies.length > 0
+              ? filters.geographies.length + " selected"
+              : "Select Geographies"
+          }}
+          <app-icon
+            name="chevron-down"
+            [size]="12"
+            className="dropdown-arrow"
+            [ngClass]="{ open: showGeographiesDropdown }"
+          ></app-icon>
+        </button>
+        <div
+          class="multi-select-options"
+          *ngIf="showGeographiesDropdown"
+          (click)="$event.stopPropagation()"
+        >
+          <label
+            *ngFor="let geography of filterMeta.geographies"
+            class="multi-select-option"
+          >
+            <input
+              type="checkbox"
+              [checked]="filters.geographies.includes(geography)"
+              (change)="toggleGeography(geography)"
+            />
+            <span>{{ geography }}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="multi-select-group">
+      <label>Managers</label>
+      <div class="multi-select-dropdown">
+        <button
+          class="multi-select-button"
+          type="button"
+          [class.active]="filters.managers.length > 0"
+          (click)="toggleManagersDropdown($event)"
+        >
+          {{
+            filters.managers.length > 0
+              ? filters.managers.length + " selected"
+              : "Select Managers"
+          }}
+          <app-icon
+            name="chevron-down"
+            [size]="12"
+            className="dropdown-arrow"
+            [ngClass]="{ open: showManagersDropdown }"
+          ></app-icon>
+        </button>
+        <div
+          class="multi-select-options"
+          *ngIf="showManagersDropdown"
+          (click)="$event.stopPropagation()"
+        >
+          <label
+            *ngFor="let manager of filterMeta.managers"
+            class="multi-select-option"
+          >
+            <input
+              type="checkbox"
+              [checked]="filters.managers.includes(manager)"
+              (change)="toggleManager(manager)"
+            />
+            <span>{{ manager }}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected Filters Display -->
+  <div
+    class="selected-filters"
+    *ngIf="
+      filters.strategies.length > 0 ||
+      filters.geographies.length > 0 ||
+      filters.managers.length > 0
+    "
+  >
+    <span class="selected-label">Active Filters:</span>
+    <app-tag
+      *ngFor="let strategy of filters.strategies"
+      [text]="strategy"
+      type="strategy"
+      [closable]="true"
+      (close)="toggleStrategy(strategy)"
+    ></app-tag>
+    <app-tag
+      *ngFor="let geography of filters.geographies"
+      [text]="geography"
+      type="geography"
+      [closable]="true"
+      (close)="toggleGeography(geography)"
+    ></app-tag>
+    <app-tag
+      *ngFor="let manager of filters.managers"
+      [text]="manager"
+      type="manager"
+      [closable]="true"
+      (close)="toggleManager(manager)"
+    ></app-tag>
+  </div>
+</div>

@@ -1,0 +1,7 @@
+<div class="tags" *ngIf="tags && tags.length > 0">
+  <app-tag
+    *ngFor="let tag of tags; trackBy: trackByTag"
+    [text]="tag"
+    [type]="type"
+  ></app-tag>
+</div>

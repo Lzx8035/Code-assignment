@@ -1,0 +1,61 @@
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Strategies</th>
+        <th>Geographies</th>
+        <th>Currency</th>
+        <th>Fund Size</th>
+        <th>Vintage</th>
+        <th>Managers</th>
+        <th>Description</th>
+        <th class="actions-header">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let fund of funds">
+        <td class="name-cell">
+          <a [routerLink]="getFundLink(fund.name)" class="fund-name-link">
+            {{ fund.name }}
+          </a>
+        </td>
+        <td class="list-cell">
+          <span *ngFor="let strategy of fund.strategies; let last = last">
+            {{ strategy }}<span *ngIf="!last">, </span>
+          </span>
+        </td>
+        <td class="list-cell">
+          <span *ngFor="let geo of fund.geographies; let last = last">
+            {{ geo }}<span *ngIf="!last">, </span>
+          </span>
+        </td>
+        <td>{{ fund.currency }}</td>
+        <td class="number-cell">{{ fund.fundSize | number : "1.2-2" }}</td>
+        <td class="number-cell">{{ fund.vintage }}</td>
+        <td class="list-cell">
+          <span *ngFor="let manager of fund.managers; let last = last">
+            {{ manager }}<span *ngIf="!last">, </span>
+          </span>
+        </td>
+        <td class="description-cell">{{ fund.description }}</td>
+        <td class="actions-cell">
+          <button
+            class="btn-icon btn-edit"
+            (click)="onEdit(fund.name)"
+            title="Edit fund"
+          >
+            <app-icon name="pencil" [size]="16"></app-icon>
+          </button>
+          <button
+            class="btn-icon btn-delete"
+            (click)="onDelete(fund.name)"
+            title="Delete fund"
+          >
+            <app-icon name="trash" [size]="16"></app-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

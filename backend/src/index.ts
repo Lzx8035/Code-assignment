@@ -82,6 +82,7 @@ app.get("/api/funds", (req: Request, res: Response): void => {
     name,
     strategies,
     geographies,
+    managers,
     currency,
     minFundSize,
     maxFundSize,
@@ -118,6 +119,18 @@ app.get("/api/funds", (req: Request, res: Response): void => {
           .map((g) => g.trim());
     funds = funds.filter((fund) =>
       geographyList.some((geography) => fund.geographies.includes(geography))
+    );
+  }
+
+  // Filter by managers
+  if (managers) {
+    const managerList = Array.isArray(managers)
+      ? managers.map((m) => String(m))
+      : String(managers)
+          .split(",")
+          .map((m) => m.trim());
+    funds = funds.filter((fund) =>
+      managerList.some((manager) => fund.managers.includes(manager))
     );
   }
 
@@ -182,7 +195,41 @@ app.get("/api/funds", (req: Request, res: Response): void => {
     }
   }
 
-  res.json(funds);
+  // Apply pagination
+  let page = req.query.page ? parseInt(String(req.query.page), 10) : 1;
+  let pageSize = req.query.pageSize
+    ? parseInt(String(req.query.pageSize), 10)
+    : 10;
+
+  // Validate and sanitize pagination parameters
+  if (!Number.isFinite(page) || page < 1) {
+    page = 1;
+  }
+  if (!Number.isFinite(pageSize) || pageSize < 1) {
+    pageSize = 10;
+  }
+
+  const totalItems = funds.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+
+  // Ensure page doesn't exceed totalPages
+  if (page > totalPages) {
+    page = totalPages;
+  }
+
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedFunds = funds.slice(startIndex, endIndex);
+
+  res.json({
+    data: paginatedFunds,
+    pagination: {
+      page,
+      pageSize,
+      total: totalItems,
+      totalPages,
+    },
+  });
 });
 
 // GET /api/funds/meta - Get filter options for dropdowns

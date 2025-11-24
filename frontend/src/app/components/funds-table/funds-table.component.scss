@@ -1,0 +1,139 @@
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead {
+    background-color: #f8f9fa;
+
+    th {
+      padding: 1rem 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #dee2e6;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #e9ecef;
+      transition: background-color 0.15s;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: 0.75rem;
+      vertical-align: top;
+      color: #555;
+    }
+  }
+}
+
+.name-cell {
+  font-weight: 500;
+  color: #333;
+
+  .fund-name-link {
+    color: #007bff;
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+  }
+}
+
+.actions-header {
+  text-align: center;
+  width: 120px;
+}
+
+.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  margin: 0 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+
+  &.btn-edit {
+    color: #007bff;
+
+    &:hover {
+      background-color: #e7f3ff;
+      transform: scale(1.1);
+    }
+  }
+
+  &.btn-delete {
+    color: #dc3545;
+
+    &:hover {
+      background-color: #fee;
+      transform: scale(1.1);
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.list-cell {
+  max-width: 200px;
+  line-height: 1.5;
+}
+
+.number-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.description-cell {
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .table-wrapper {
+    font-size: 0.8rem;
+  }
+
+  .data-table {
+    thead th,
+    tbody td {
+      padding: 0.5rem;
+    }
+  }
+}

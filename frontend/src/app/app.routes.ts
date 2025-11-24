@@ -8,5 +8,6 @@ export const routes: Routes = [
   { path: 'index', component: IndexComponent },
   { path: 'admin/funds', component: AdminDataTableComponent },
   { path: 'admin/funds/:id/edit', component: AdminEditComponent },
+  { path: 'funds/:id', component: UserFacingDataComponent },
   { path: '**', redirectTo: 'index' },
 ];

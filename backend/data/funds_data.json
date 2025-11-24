@@ -7,7 +7,8 @@
     ],
     "geographies": [
       "Global",
-      "Middle East"
+      "Middle East",
+      "Asia"
     ],
     "currency": "CAD",
     "fundSize": 1199,
@@ -15,7 +16,8 @@
     "managers": [
       "Silver Rock",
       "Orion Equity",
-      "Blue Lake Fund"
+      "Blue Lake Fund",
+      "Apex Ventures"
     ],
     "description": "I am a test\n"
   },

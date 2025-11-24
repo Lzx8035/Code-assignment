@@ -1,9 +1,26 @@
 <div class="user-facing-container">
   <header class="header">
     <button class="btn btn-back" (click)="goBack()">
-      ← Back to Data Table
+      <app-icon name="arrow-left" [size]="16"></app-icon>
+      Back to Data Table
     </button>
-    <h1>Fund Details</h1>
+    <div class="header-content">
+      <h1>Fund Details</h1>
+      <div class="header-actions" *ngIf="!loading && fund">
+        <button class="btn btn-edit" (click)="editFund()" title="Edit fund">
+          <app-icon name="pencil" [size]="16"></app-icon>
+          Edit
+        </button>
+        <button
+          class="btn btn-delete"
+          (click)="deleteFund()"
+          title="Delete fund"
+        >
+          <app-icon name="trash" [size]="16"></app-icon>
+          Delete
+        </button>
+      </div>
+    </div>
   </header>
 
   <div *ngIf="loading" class="loading">
@@ -47,35 +64,17 @@
 
       <div class="info-section">
         <h3>Strategies</h3>
-        <div class="tags">
-          <span
-            *ngFor="let strategy of fund.strategies"
-            class="tag tag-strategy"
-          >
-            {{ strategy }}
-          </span>
-        </div>
+        <app-tag-list [tags]="fund.strategies" type="strategy"></app-tag-list>
       </div>
 
       <div class="info-section">
         <h3>Geographies</h3>
-        <div class="tags">
-          <span
-            *ngFor="let geography of fund.geographies"
-            class="tag tag-geography"
-          >
-            {{ geography }}
-          </span>
-        </div>
+        <app-tag-list [tags]="fund.geographies" type="geography"></app-tag-list>
       </div>
 
       <div class="info-section">
         <h3>Fund Managers</h3>
-        <div class="tags">
-          <span *ngFor="let manager of fund.managers" class="tag tag-manager">
-            {{ manager }}
-          </span>
-        </div>
+        <app-tag-list [tags]="fund.managers" type="manager"></app-tag-list>
       </div>
 
       <div class="info-section">

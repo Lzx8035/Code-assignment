@@ -1,0 +1,65 @@
+.tag {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+
+  &.tag-strategy {
+    background-color: #e3f2fd;
+    color: #1976d2;
+  }
+
+  &.tag-geography {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+  }
+
+  &.tag-manager {
+    background-color: #fff3e0;
+    color: #e65100;
+  }
+
+  &.tag-closable {
+    padding-right: 0.5rem;
+  }
+}
+
+.tag-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.tag.tag-strategy .tag-close:hover {
+  background-color: rgba(25, 118, 210, 0.2);
+}
+
+.tag.tag-geography .tag-close:hover {
+  background-color: rgba(123, 31, 162, 0.2);
+}
+
+.tag.tag-manager .tag-close:hover {
+  background-color: rgba(230, 81, 0, 0.2);
+}
