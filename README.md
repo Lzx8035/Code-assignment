@@ -46,8 +46,8 @@ You are expected to create at least **three components**:
     - Any message you want us to consider regarding to this project.
 - Remove all `node_modules` folder
 - Zip the project folder and send your submissions
-    - To: jonathanc@seclink.com
-    - CC: team@seclink.com
+    - To: xxx
+    - CC: xxx
 
 ### Notes
 - Name: Lea Liang
@@ -149,3 +149,4 @@ View all API requests and examples:
 
 **Postman Web Link:**  
 https://supply-architect-7804003-3576417.postman.co/workspace/Lea-Liang's-Workspace~110f636f-bdfa-4e70-8f58-d1c8b2f89384/collection/47064750-000079b3-a1d5-48ee-b798-f2fd82ce7e90?action=share&creator=47064750&active-environment=47064750-e89e2841-ed36-4513-96b3-d73c3a577e11
+
